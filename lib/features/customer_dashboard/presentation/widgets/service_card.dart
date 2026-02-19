@@ -42,114 +42,121 @@ class ServiceCard extends ConsumerWidget {
                 ),
               ],
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Service Booked Info',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey.shade500,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(
-                        'Service Booked Info',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey.shade500,
-                          fontWeight: FontWeight.w500,
+                      Expanded(
+                        child: Text(
+                          formattedDate,
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              formattedDate,
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 6),
+                        child: Container(
+                          width: 42,
+                          height: 42,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100.withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: Container(
-                              width: 44,
-                              height: 44,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade100.withOpacity(0.6),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: const Icon(Icons.handyman_outlined,
-                                  color: Colors.black54),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          const Icon(Icons.info_outline,
-                              size: 14, color: Colors.black45),
-                          const SizedBox(width: 4),
-                          Text(
-                            serviceCountdown,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontStyle: FontStyle.italic,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black54,
-                            ),
-                          ),
-                        ],
+                          child: const Icon(Icons.handyman_outlined,
+                              size: 20,
+                              color: Colors.black54),
+                        ),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 12),
-                // Button aligned to the right, extending to card edge
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.55,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.cyan.withOpacity(0.25),
-                          blurRadius: 8,
-                          spreadRadius: 0,
-                          offset: const Offset(0, 4),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      const Icon(Icons.info_outline,
+                          size: 14, color: Colors.black45),
+                      const SizedBox(width: 4),
+                      Text(
+                        serviceCountdown,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black54,
                         ),
-                      ],
-                    ),
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.cyan.shade100,
-                        foregroundColor: Colors.black87,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                            topLeft: const Radius.circular(20),
-                            bottomLeft: const Radius.circular(20),
-                            topRight: const Radius.circular(8),
-                            bottomRight: const Radius.circular(25),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  // Modern button — right-aligned, fitted inside card
+                  Row(
+                    children: [
+                      const Spacer(),
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.cyan.shade200.withOpacity(0.5),
+                                blurRadius: 10,
+                                spreadRadius: 0,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.cyan.shade100,
+                            borderRadius: BorderRadius.circular(12),
+                            child: InkWell(
+                              onTap: () {},
+                              borderRadius: BorderRadius.circular(12),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 13),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text(
+                                      'Book a Service',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Icon(
+                                      Icons.arrow_forward_rounded,
+                                      size: 18,
+                                      color: Colors.black54,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                      child: const Text(
-                        'Book a Service',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+                    ],
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

@@ -20,6 +20,10 @@ class CustomerDashboardPage extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
+              // Color(0xFFCFD8DC),
+              // Color(0xFFD6DEE2),
+              // Color(0xFFCCD5DA),
+              // Color(0xFFD0D9DE),
               Color(0xFFE0F7FA),
               Color(0xFFEEF6F8),
               Color(0xFFE8EAF6),

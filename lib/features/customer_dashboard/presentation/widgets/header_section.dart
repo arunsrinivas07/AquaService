@@ -45,7 +45,6 @@ class HeaderSection extends ConsumerWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade300),
               borderRadius: BorderRadius.circular(10),
             ),
             child: ClipRRect(

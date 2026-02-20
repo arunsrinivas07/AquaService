@@ -1,6 +1,11 @@
 {
+<<<<<<< HEAD
     "name": "ro_water",
     "short_name": "ro_water",
+=======
+    "name": "aqua_service",
+    "short_name": "aqua_service",
+>>>>>>> sanjiv
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

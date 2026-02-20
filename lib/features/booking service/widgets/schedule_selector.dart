@@ -28,6 +28,7 @@ class ScheduleSelectorCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AppCard(
+        color: Colors.white,
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.base,
           vertical: AppSpacing.md,
@@ -111,11 +112,6 @@ class ScheduleSelector extends ConsumerWidget {
               child: ScheduleSelectorCard(
                 title: 'Time',
                 subtitle: 'Select your Availability',
-                trailing: const Icon(
-                  Icons.access_time_rounded,
-                  size: 18,
-                  color: AppColors.textPrimary,
-                ),
                 onTap: () async {
                   final picked = await showTimePicker(
                     context: context,
@@ -138,7 +134,7 @@ class ScheduleSelector extends ConsumerWidget {
         ),
         const SizedBox(height: AppSpacing.md),
         // Confirm date row
-        _ConfirmDateCard(),
+        const _ConfirmDateCard(),
       ],
     );
   }
@@ -146,6 +142,8 @@ class ScheduleSelector extends ConsumerWidget {
 
 // ── Confirm date display card ─────────────────────────────────────────────────
 class _ConfirmDateCard extends ConsumerWidget {
+  const _ConfirmDateCard();
+
   static const _months = [
     '',
     'January',
@@ -183,6 +181,7 @@ class _ConfirmDateCard extends ConsumerWidget {
     final timeStr = time ?? '—';
 
     return AppCard(
+      color: Colors.white,
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.base,
         vertical: AppSpacing.base,

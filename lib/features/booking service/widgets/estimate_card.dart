@@ -23,6 +23,7 @@ class EstimateRow extends ConsumerWidget {
         Expanded(
           flex: 4,
           child: AppCard(
+            color: Colors.white,
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.base,
               vertical: 7,
@@ -71,6 +72,7 @@ class _MachineModelDropdown extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return AppCard(
+      color: Colors.white,
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.base,
         vertical: 7,

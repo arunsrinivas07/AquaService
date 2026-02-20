@@ -25,7 +25,7 @@ class ServiceScheduleScreen extends ConsumerWidget {
     final payment = ref.watch(paymentProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4FAFB),
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (ctx, constraints) {
@@ -187,6 +187,7 @@ class _ConfirmButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return PrimaryButton(
       label: 'Confirm Schedule',
+      backgroundColor: const Color.fromRGBO(204, 245, 255, 1),
       onPressed: () {
         // Handle schedule confirmation
       },

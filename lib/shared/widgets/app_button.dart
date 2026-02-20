@@ -7,8 +7,16 @@ import '../../core/theme/app_theme.dart';
 class PrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
+  final Color? backgroundColor;
+  final Color? borderColor;
 
-  const PrimaryButton({super.key, required this.label, this.onPressed});
+  const PrimaryButton({
+    super.key,
+    required this.label,
+    this.onPressed,
+    this.backgroundColor,
+    this.borderColor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,11 +26,11 @@ class PrimaryButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color.fromRGBO(204, 245, 255, 1),
+          backgroundColor: backgroundColor ?? Colors.white,
           foregroundColor: AppColors.textPrimary,
           elevation: 0,
           side: BorderSide(
-            color: const Color.fromARGB(255, 138, 215, 231),
+            color: borderColor ?? const Color.fromARGB(255, 138, 215, 231),
             width: 1.0,
           ),
           shape: RoundedRectangleBorder(

@@ -67,7 +67,7 @@ class _WalletIconButton extends StatelessWidget {
       width: 48,
       height: 48,
       decoration: BoxDecoration(
-        color: const Color.fromRGBO(137, 207, 240, 0.3),
+        color: Colors.white.withOpacity(0.3),
         borderRadius: BorderRadius.circular(AppRadius.md),
       ),
       child: const Icon(

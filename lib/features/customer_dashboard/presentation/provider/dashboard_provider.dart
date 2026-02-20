@@ -5,19 +5,19 @@ import '../../model/dashboard_state.dart';
 
 class DashboardNotifier extends StateNotifier<DashboardState> {
   DashboardNotifier()
-      : super(
-          DashboardState(
-            userName: 'Vishnu',
-            machineName: 'AquaPure Pro X',
-            modelNumber: 'Selectos 212',
-            tdsValue: 50,
-            isHealthy: true,
-            outstandingBalance: 134,
-            nextServiceDate: DateTime(2025, 2, 28),
-            serviceCountdown: 'In 15 days',
-            currentNavIndex: 2,
-          ),
-        );
+    : super(
+        DashboardState(
+          userName: 'Vishnu',
+          machineName: 'AquaPure Pro X',
+          modelNumber: 'Selectos 212',
+          tdsValue: 50,
+          isHealthy: true,
+          outstandingBalance: 134,
+          nextServiceDate: DateTime(2025, 2, 28),
+          serviceCountdown: 'In 15 days',
+          currentNavIndex: 2,
+        ),
+      );
 
   void setNavIndex(int index) {
     state = state.copyWith(currentNavIndex: index);
@@ -30,5 +30,5 @@ class DashboardNotifier extends StateNotifier<DashboardState> {
 
 final dashboardProvider =
     StateNotifierProvider<DashboardNotifier, DashboardState>(
-  (ref) => DashboardNotifier(),
-);
+      (ref) => DashboardNotifier(),
+    );

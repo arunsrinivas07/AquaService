@@ -1,10 +1,6 @@
-// lib/features/machines/widgets/machine_card.dart
-
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_spacing.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../shared/widgets/app_badge.dart';
 import '../../../shared/widgets/app_network_image.dart';
+import '../../../shared/widgets/app_card.dart';
 import '../models/machine_model.dart';
 
 class MachineCard extends StatelessWidget {
@@ -14,85 +10,84 @@ class MachineCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 220,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        boxShadow: const [
-          BoxShadow(
-            color: AppColors.shadow,
-            blurRadius: 12,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            AppNetworkImage(url: machine.imageUrl, fit: BoxFit.cover),
-            // Gradient overlay
-            const DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.transparent, Color(0xCC000000)],
-                  stops: [0.4, 1.0],
-                ),
-              ),
-            ),
-            // Bottom content
-            Positioned(
-              left: AppSpacing.base,
-              right: AppSpacing.base,
-              bottom: AppSpacing.base,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
+    return AppCard(
+      isGlassy: true,
+      padding: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            child: SizedBox(
+              height: 180,
+              width: double.infinity,
+              child: Stack(
+                fit: StackFit.expand,
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Machine Details',
-                          style: const TextStyle(
-                            color: AppColors.textOnImage,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(
-                          machine.name,
-                          style: const TextStyle(
-                            color: AppColors.textOnImage,
-                            fontSize: 13,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '${machine.date} - ${machine.serialNumber}',
-                          style: const TextStyle(
-                            color: AppColors.textOnImage,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
+                  AppNetworkImage(url: machine.imageUrl, fit: BoxFit.cover),
+                  const DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Colors.transparent, Color(0x88000000)],
+                      ),
                     ),
-                  ),
-                  AppBadge(
-                    label: machine.statusLabel,
-                    color: const Color.fromARGB(255, 100, 245, 105),
-                    variant: BadgeVariant.filled,
                   ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        machine.name,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${machine.date} • ${machine.serialNumber}',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE8F5E9),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    machine.statusLabel,
+                    style: const TextStyle(
+                      color: Color(0xFF2E7D32),
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

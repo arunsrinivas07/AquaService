@@ -44,6 +44,7 @@ class ServiceInfoCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final info = ref.watch(serviceInfoProvider);
     return AppCard(
+      isGlassy: true,
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,13 +95,15 @@ class ServiceInfoCard extends ConsumerWidget {
             ),
           ),
           AppIconContainer(
+            size: 42,
+            radius: 12,
             icon: const Icon(
               Icons.handyman_outlined,
-              color: AppColors.textPrimary,
-              size: 22,
+              color: Colors.black54,
+              size: 20,
             ),
-            color: AppColors.tealLight,
-            borderColor: const Color.fromARGB(255, 138, 215, 231),
+            color: Colors.grey.shade100.withOpacity(1),
+            borderColor: Colors.transparent,
           ),
         ],
       ),

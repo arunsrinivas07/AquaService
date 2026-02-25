@@ -1,4 +1,5 @@
 // lib/features/customer_dashboard/presentation/widgets/service_card.dart
+import 'package:aqua_service/features/booking%20service/screens/service_schedule_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -9,13 +10,14 @@ class ServiceCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final nextServiceDate =
-        ref.watch(dashboardProvider.select((s) => s.nextServiceDate));
-    final serviceCountdown =
-        ref.watch(dashboardProvider.select((s) => s.serviceCountdown));
+    final nextServiceDate = ref.watch(
+      dashboardProvider.select((s) => s.nextServiceDate),
+    );
+    final serviceCountdown = ref.watch(
+      dashboardProvider.select((s) => s.serviceCountdown),
+    );
 
-    final formattedDate =
-        DateFormat('EEEE, MMMM d').format(nextServiceDate);
+    final formattedDate = DateFormat('EEEE, MMMM d').format(nextServiceDate);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -69,9 +71,11 @@ class ServiceCard extends ConsumerWidget {
                     color: Colors.grey.shade100.withOpacity(0.6),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.handyman_outlined,
-                      size: 20,
-                      color: Colors.black54),
+                  child: const Icon(
+                    Icons.handyman_outlined,
+                    size: 20,
+                    color: Colors.black54,
+                  ),
                 ),
               ),
             ],
@@ -85,8 +89,11 @@ class ServiceCard extends ConsumerWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.info_outline,
-                      size: 14, color: Colors.black45),
+                  const Icon(
+                    Icons.info_outline,
+                    size: 14,
+                    color: Colors.black45,
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     serviceCountdown,
@@ -119,7 +126,14 @@ class ServiceCard extends ConsumerWidget {
                     color: Colors.cyan.shade100,
                     borderRadius: BorderRadius.circular(12),
                     child: InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ServiceScheduleScreen(),
+                          ),
+                        );
+                      },
                       borderRadius: BorderRadius.circular(12),
                       child: const Padding(
                         padding: EdgeInsets.symmetric(vertical: 13),

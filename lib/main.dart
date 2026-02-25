@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'features/customer_dashboard/presentation/page/customer_dashboard_page.dart';
+import 'features/machines/screens/machine_payments_screen.dart';
 
 void main() {
   runApp(const ProviderScope(child: AquaPureApp()));
@@ -22,7 +23,7 @@ class AquaPureApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: GoogleFonts.poppins().fontFamily,
       ),
-      home: const CustomerDashboardPage(),
+      home: CustomerDashboardPage(),
     );
   }
 }

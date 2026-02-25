@@ -28,7 +28,7 @@ class ScheduleSelectorCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AppCard(
-        color: Colors.white,
+        isGlassy: true,
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.base,
           vertical: AppSpacing.md,
@@ -181,7 +181,7 @@ class _ConfirmDateCard extends ConsumerWidget {
     final timeStr = time ?? '—';
 
     return AppCard(
-      color: Colors.white,
+      isGlassy: true,
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.base,
         vertical: AppSpacing.base,

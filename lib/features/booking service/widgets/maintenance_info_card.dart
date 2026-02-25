@@ -11,8 +11,19 @@ class MaintenanceInfoCard extends ConsumerWidget {
   const MaintenanceInfoCard({super.key});
 
   static const _months = [
-    '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    '',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
 
   String _fmt(DateTime d) => '${d.day} ${_months[d.month]} ${d.year}';
@@ -22,14 +33,12 @@ class MaintenanceInfoCard extends ConsumerWidget {
     final info = ref.watch(maintenanceInfoProvider);
 
     return AppCard(
+      isGlassy: true,
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _InfoRow(
-            label: 'Next Maintenance Date',
-            value: _fmt(info.nextDate),
-          ),
+          _InfoRow(label: 'Next Maintenance Date', value: _fmt(info.nextDate)),
           const SizedBox(height: AppSpacing.lg),
           _InfoRow(
             label: 'Previous Maintenance date',

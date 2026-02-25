@@ -25,27 +25,38 @@ class AppChip extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg,
+          horizontal: AppSpacing.sm, // Reduced padding for better fit
           vertical: AppSpacing.md,
         ),
         decoration: BoxDecoration(
           color: selected ? Colors.white.withOpacity(0.9) : Colors.transparent,
           borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(
-            color: selected ? AppColors.teal : AppColors.cardBorder,
-            width: selected ? 1.4 : 1,
+            color: selected ? const Color(0xFFB3E5FC) : AppColors.cardBorder,
+            width: selected ? 1.5 : 1,
           ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (icon != null) ...[icon!, const SizedBox(width: AppSpacing.sm)],
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: selected ? AppColors.tealDark : AppColors.textSecondary,
+            if (icon != null) ...[
+              icon!,
+              const SizedBox(width: AppSpacing.xs), // Tighter spacing
+            ],
+            Flexible(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 14, // Slightly smaller base font
+                    fontWeight: FontWeight.w700,
+                    color: selected
+                        ? const Color(0xFF00ACC1)
+                        : AppColors.textSecondary,
+                  ),
+                ),
               ),
             ),
           ],

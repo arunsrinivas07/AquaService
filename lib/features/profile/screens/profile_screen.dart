@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../login/screens/login_screen.dart';
+
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
@@ -119,7 +121,7 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Log Out Button
-            _buildLogOutButton(),
+            _buildLogOutButton(context),
             const SizedBox(height: 24),
           ],
         ),
@@ -154,8 +156,11 @@ class ProfileScreen extends StatelessWidget {
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Container(
                       color: Colors.purple.shade900,
-                      child: const Icon(Icons.person,
-                          color: Colors.white, size: 40),
+                      child: const Icon(
+                        Icons.person,
+                        color: Colors.white,
+                        size: 40,
+                      ),
                     ),
                   ),
                 ),
@@ -176,25 +181,21 @@ class ProfileScreen extends StatelessWidget {
                   const SizedBox(height: 4),
                   const Text(
                     'ID : #123456-A',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(fontSize: 13, color: Colors.grey),
                   ),
                   const SizedBox(height: 6),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey.shade400),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: const Text(
                       '6374334250',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.black87,
-                      ),
+                      style: TextStyle(fontSize: 12, color: Colors.black87),
                     ),
                   ),
                 ],
@@ -218,10 +219,7 @@ class ProfileScreen extends StatelessWidget {
               ),
               child: const Text(
                 'Edit Profile',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -246,14 +244,10 @@ class ProfileScreen extends StatelessWidget {
         leading: Icon(icon, color: iconColor, size: 24),
         title: Text(
           label,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 15,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
         ),
         trailing: const Icon(Icons.chevron_right, color: Colors.black54),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       ),
     );
   }
@@ -291,10 +285,14 @@ class ProfileScreen extends StatelessWidget {
                     fontSize: 15,
                   ),
                 ),
-                trailing:
-                    const Icon(Icons.chevron_right, color: Colors.black54),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                trailing: const Icon(
+                  Icons.chevron_right,
+                  color: Colors.black54,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 4,
+                ),
               ),
               if (!isLast)
                 Divider(
@@ -311,13 +309,19 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLogOutButton() {
+  Widget _buildLogOutButton(BuildContext context) {
     return Center(
       child: SizedBox(
         width: double.infinity,
         height: 52,
         child: OutlinedButton.icon(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginScreen()),
+              (route) => false,
+            );
+          },
           icon: const Icon(Icons.logout, color: Color(0xFFE53935), size: 20),
           label: const Text(
             'Log Out',

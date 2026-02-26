@@ -1,7 +1,7 @@
 // lib/features/customer_dashboard/presentation/provider/dashboard_provider.dart
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../model/dashboard_state.dart';
+import '../models/dashboard_state.dart';
 
 class DashboardNotifier extends StateNotifier<DashboardState> {
   DashboardNotifier()

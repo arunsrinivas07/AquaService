@@ -1,11 +1,14 @@
 // lib/main.dart
 
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'features/customer_dashboard/providers/dashboard_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'features/customer_dashboard/presentation/page/customer_dashboard_page.dart';
+import 'features/customer_dashboard/screens/customer_dashboard_page.dart';
+import 'features/booking_service/screens/service_schedule_screen.dart';
 import 'features/machines/screens/machine_payments_screen.dart';
+import 'features/splash/screens/splash_screen.dart';
+import 'shared/widgets/navbar/navbar.dart';
 
 void main() {
   runApp(const ProviderScope(child: AquaPureApp()));
@@ -13,22 +16,10 @@ void main() {
 
 class AquaPureApp extends StatelessWidget {
   const AquaPureApp({super.key});
-=======
-import 'navbar/navbar.dart';
-import 'payment/payment.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
->>>>>>> vishnu
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-<<<<<<< HEAD
       title: 'AquaPure',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -36,47 +27,33 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: GoogleFonts.poppins().fontFamily,
       ),
-      home: CustomerDashboardPage(),
-=======
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: 'Roboto',
-      ),
-      home: const MainScreen(),
+      home: const SplashScreen(),
     );
   }
 }
 
-class MainScreen extends StatefulWidget {
+class MainScreen extends ConsumerWidget {
   const MainScreen({super.key});
 
-  @override
-  State<MainScreen> createState() => _MainScreenState();
-}
-
-class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 2; // Home selected by default
-
-  final List<Widget> _pages = [
-    const Center(child: Text("Profile Page")),
-    const PaymentSourceScreen(), // Index 1: Cash
-    const Center(child: Text("Home Page")), // Index 2: Home
-    const Center(child: Text("Status Page")),
+  final List<Widget> _pages = const [
+    ServiceScheduleScreen(), // Index 0: Book Service
+    MachinePaymentsScreen(), // Index 1: Payment / Due
+    CustomerDashboardPage(), // Index 2: Home
+    Center(child: Text("Status Page")), // Index 3: Status
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentIndex = ref.watch(dashboardProvider).currentNavIndex;
+
     return Scaffold(
-      body: _pages[_currentIndex],
+      body: IndexedStack(index: currentIndex, children: _pages),
       bottomNavigationBar: CustomCurvedNavigationBar(
-        currentIndex: _currentIndex,
+        currentIndex: currentIndex,
         onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
+          ref.read(dashboardProvider.notifier).setNavIndex(index);
         },
       ),
->>>>>>> vishnu
     );
   }
 }

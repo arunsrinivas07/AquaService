@@ -1,9 +1,8 @@
-// lib/features/customer_dashboard/presentation/widgets/service_card.dart
-import 'package:aqua_service/features/booking%20service/screens/service_schedule_screen.dart';
+import '../../booking_service/screens/service_schedule_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../provider/dashboard_provider.dart';
+import '../providers/dashboard_provider.dart';
 
 class ServiceCard extends ConsumerWidget {
   const ServiceCard({super.key});

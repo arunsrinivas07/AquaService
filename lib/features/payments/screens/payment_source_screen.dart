@@ -26,9 +26,9 @@ class _PaymentSourceScreenState extends State<PaymentSourceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: const Color(0xFFEAF6F6),
-      child: SafeArea(
+    return Scaffold(
+      backgroundColor: const Color(0xFFEAF6F6),
+      body: SafeArea(
         child: Column(
           children: [
             _buildAppBar(context),
@@ -73,7 +73,7 @@ class _PaymentSourceScreenState extends State<PaymentSourceScreen> {
             ),
           ),
           const Text(
-            'Payment Souce',
+            'Payment Source',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -157,10 +157,7 @@ class _PaymentSourceScreenState extends State<PaymentSourceScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFFDEF0F0),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: const Color(0xFF90CAC9),
-          width: 1.5,
-        ),
+        border: Border.all(color: const Color(0xFF90CAC9), width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -242,11 +239,7 @@ class _PaymentSourceScreenState extends State<PaymentSourceScreen> {
                   color: const Color(0xFF4CAF50),
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: Icon(
-                  icon,
-                  color: Colors.white,
-                  size: 16,
-                ),
+                child: Icon(icon, color: Colors.white, size: 16),
               ),
             if (isUPI)
               Container(
@@ -327,10 +320,7 @@ class _PaymentSourceScreenState extends State<PaymentSourceScreen> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(30),
-          border: Border.all(
-            color: const Color(0xFF4CAF50),
-            width: 2,
-          ),
+          border: Border.all(color: const Color(0xFF4CAF50), width: 2),
         ),
         child: const Center(
           child: Text(

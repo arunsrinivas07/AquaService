@@ -1,15 +1,17 @@
 // lib/features/customer_dashboard/presentation/widgets/payment_card.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../provider/dashboard_provider.dart';
+import '../../payments/screens/payment_source_screen.dart';
+import '../providers/dashboard_provider.dart';
 
 class PaymentCard extends ConsumerWidget {
   const PaymentCard({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final balance =
-        ref.watch(dashboardProvider.select((s) => s.outstandingBalance));
+    final balance = ref.watch(
+      dashboardProvider.select((s) => s.outstandingBalance),
+    );
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -65,9 +67,10 @@ class PaymentCard extends ConsumerWidget {
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
-                      Icons.account_balance_wallet_outlined,
-                      size: 20,
-                      color: Colors.black54),
+                    Icons.account_balance_wallet_outlined,
+                    size: 20,
+                    color: Colors.black54,
+                  ),
                 ),
               ),
             ],
@@ -80,7 +83,9 @@ class PaymentCard extends ConsumerWidget {
               // Due in 5 days pill — wraps content only
               Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 6),
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.red.shade300),
                   borderRadius: BorderRadius.circular(16),
@@ -144,7 +149,14 @@ class PaymentCard extends ConsumerWidget {
                     color: Colors.cyan.shade100,
                     borderRadius: BorderRadius.circular(12),
                     child: InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const PaymentSourceScreen(),
+                          ),
+                        );
+                      },
                       borderRadius: BorderRadius.circular(12),
                       child: const Padding(
                         padding: EdgeInsets.symmetric(vertical: 13),

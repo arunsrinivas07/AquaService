@@ -1,8 +1,8 @@
-// lib/features/service/screens/service_schedule_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import '../../profile/screens/profile_screen.dart';
+import '../../../shared/widgets/booking_success_popup.dart';
+import '../../notifications/screens/notifications_screen.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../shared/widgets/app_chip.dart';
@@ -100,17 +100,25 @@ class _ProfileHeader extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 24,
-            backgroundColor: Colors.deepPurple.shade100,
-            child: ClipOval(
-              child: Image.network(
-                avatarUrl,
-                fit: BoxFit.cover,
-                width: 48,
-                height: 48,
-                errorBuilder: (_, __, ___) =>
-                    const Icon(Icons.person, color: Colors.deepPurple),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              );
+            },
+            child: CircleAvatar(
+              radius: 24,
+              backgroundColor: Colors.deepPurple.shade100,
+              child: ClipOval(
+                child: Image.network(
+                  avatarUrl,
+                  fit: BoxFit.cover,
+                  width: 48,
+                  height: 48,
+                  errorBuilder: (_, __, ___) =>
+                      const Icon(Icons.person, color: Colors.deepPurple),
+                ),
               ),
             ),
           ),
@@ -137,14 +145,26 @@ class _ProfileHeader extends StatelessWidget {
             ],
           ),
           const Spacer(),
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
-            child: const Icon(
-              Icons.notifications_outlined,
-              color: Colors.black87,
-              size: 26,
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NotificationsScreen(),
+                ),
+              );
+            },
+            child: Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.notifications_outlined,
+                color: Colors.black87,
+                size: 18,
+              ),
             ),
           ),
         ],
@@ -243,11 +263,11 @@ class _ScheduleSection extends StatelessWidget {
 }
 
 // ── Confirm button ────────────────────────────────────────────────────────────
-class _ConfirmButton extends StatelessWidget {
+class _ConfirmButton extends ConsumerWidget {
   const _ConfirmButton();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
@@ -267,7 +287,7 @@ class _ConfirmButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           child: InkWell(
             onTap: () {
-              // Handle schedule confirmation
+              BookingSuccessPopup.show(context);
             },
             borderRadius: BorderRadius.circular(12),
             child: const Padding(

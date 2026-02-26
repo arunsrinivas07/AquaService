@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_spacing.dart';
+import '../../payments/screens/payment_source_screen.dart';
 import '../../payments/providers/payment_provider.dart';
 import '../../payments/widgets/balance_card.dart';
 import '../../payments/widgets/profile_header.dart';
@@ -60,7 +61,15 @@ class MachinePaymentsScreen extends ConsumerWidget {
                         BalanceCard(
                           amount: payment.outstandingBalance,
                           dueDays: payment.dueDays,
-                          onPayNow: () {},
+                          onPayNow: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const PaymentSourceScreen(),
+                              ),
+                            );
+                          },
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         const Padding(

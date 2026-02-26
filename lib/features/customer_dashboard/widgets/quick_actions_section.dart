@@ -1,11 +1,13 @@
 // lib/features/customer_dashboard/presentation/widgets/quick_actions_section.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/dashboard_provider.dart';
 
-class QuickActionsSection extends StatelessWidget {
+class QuickActionsSection extends ConsumerWidget {
   const QuickActionsSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
@@ -13,10 +15,7 @@ class QuickActionsSection extends StatelessWidget {
         children: [
           const Text(
             'Quick Actions',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
           Row(
@@ -25,15 +24,19 @@ class QuickActionsSection extends StatelessWidget {
                 child: _QuickActionButton(
                   title: 'Book Service',
                   subtitle: 'Schedule Service',
-                  onTap: () {},
+                  icon: Icons.calendar_month_outlined,
+                  onTap: () =>
+                      ref.read(dashboardProvider.notifier).setNavIndex(0),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: _QuickActionButton(
-                  title: 'Machine Details',
-                  subtitle: 'System Information',
-                  onTap: () {},
+                  title: 'Machines',
+                  subtitle: 'Device Status',
+                  icon: Icons.precision_manufacturing_outlined,
+                  onTap: () =>
+                      ref.read(dashboardProvider.notifier).setNavIndex(1),
                 ),
               ),
             ],
@@ -45,7 +48,9 @@ class QuickActionsSection extends StatelessWidget {
                 child: _QuickActionButton(
                   title: 'Payment Due',
                   subtitle: 'Outstanding Bill',
-                  onTap: () {},
+                  icon: Icons.account_balance_wallet_outlined,
+                  onTap: () =>
+                      ref.read(dashboardProvider.notifier).setNavIndex(1),
                 ),
               ),
               const SizedBox(width: 12),
@@ -53,6 +58,7 @@ class QuickActionsSection extends StatelessWidget {
                 child: _QuickActionButton(
                   title: 'Complaint',
                   subtitle: 'Report Issue',
+                  icon: Icons.error_outline_rounded,
                   onTap: () {},
                 ),
               ),
@@ -67,11 +73,13 @@ class QuickActionsSection extends StatelessWidget {
 class _QuickActionButton extends StatelessWidget {
   final String title;
   final String subtitle;
+  final IconData icon; // Added icon
   final VoidCallback onTap;
 
   const _QuickActionButton({
     required this.title,
     required this.subtitle,
+    required this.icon,
     required this.onTap,
   });
 
@@ -92,31 +100,33 @@ class _QuickActionButton extends StatelessWidget {
             BoxShadow(
               color: Colors.black.withOpacity(0.06),
               blurRadius: 10,
-              spreadRadius: 0,
               offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey.shade500,
-                  ),
-                ),
-              ],
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.cyan.shade50,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, size: 20, color: Colors.cyan.shade700),
             ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+            ),
+          ],
+        ),
       ),
     );
   }

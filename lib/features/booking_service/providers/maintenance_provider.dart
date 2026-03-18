@@ -12,6 +12,7 @@ class MaintenanceRecord {
   final String machineModel;
   final String serviceType;
   final String status;
+  final String? address;
 
   const MaintenanceRecord({
     required this.docId,
@@ -19,6 +20,7 @@ class MaintenanceRecord {
     required this.machineModel,
     this.serviceType = 'maintenance',
     this.status = 'pending',
+    this.address,
   });
 
   factory MaintenanceRecord.fromFirestore(Map<String, dynamic> data) {
@@ -39,6 +41,7 @@ class MaintenanceRecord {
       machineModel: data['machine Model']?.toString() ?? '',
       serviceType: (data['service_type'] ?? data['type'])?.toString() ?? 'maintenance',
       status: rawStatus,
+      address: data['address']?.toString(),
     );
   }
 }
@@ -84,14 +87,27 @@ final maintenanceProvider = FutureProvider<MaintenanceSummary>((ref) async {
 
   final now = DateTime.now();
 
-  // Find previous (past) completed maintenance dates
-  for (final r in records) {
-    if (r.serviceType.toLowerCase() == 'maintenance' &&
-        r.dateTime.isBefore(now) &&
-        r.status == 'completed' &&
-        previousDate == null) {
-      previousDate = r.dateTime;
-    }
+  // Try to parse 'previous_maintenance_date' and 'next_maintenance_date' from CustomerDetails
+  final customerData = await service.getCustomerByPhone(phone);
+  if (customerData != null) {
+      if (customerData['previous_maintenance_date'] is Timestamp) {
+          previousDate = (customerData['previous_maintenance_date'] as Timestamp).toDate();
+      }
+      if (customerData['next_maintenance_date'] is Timestamp) {
+          nextDate = (customerData['next_maintenance_date'] as Timestamp).toDate();
+      }
+  }
+
+  // Find previous (past) completed maintenance dates if not found in CustomerDetails
+  if (previousDate == null) {
+      for (final r in records) {
+        if (r.serviceType.toLowerCase() == 'maintenance' &&
+            r.dateTime.isBefore(now) &&
+            r.status == 'completed' &&
+            previousDate == null) {
+          previousDate = r.dateTime;
+        }
+      }
   }
 
   // Fallback: if no explicitly completed past records, take most recent past one
@@ -106,45 +122,62 @@ final maintenanceProvider = FutureProvider<MaintenanceSummary>((ref) async {
   }
 
   // ── Auto-sync: persist the latest completed maintenance date ─────────────
-  // If we found a completed date, compare it with what's stored in
+  // If we found a completed date from records, compare it with what's stored in
   // CustomerDetails and update if the computed date is newer.
-  if (previousDate != null) {
-    final customerData = await service.getCustomerByPhone(phone);
-    if (customerData != null) {
-      final docId = customerData['docId']?.toString() ?? '';
-      final storedRaw = customerData['previous_maintenance_date'];
-      DateTime? storedDate;
-      if (storedRaw is Timestamp) {
-        storedDate = storedRaw.toDate();
-      }
+  bool updateRequired = false;
+  if (previousDate != null && customerData != null) {
+    final docId = customerData['docId']?.toString() ?? '';
+    final storedRaw = customerData['previous_maintenance_date'];
+    DateTime? storedDate;
+    if (storedRaw is Timestamp) {
+      storedDate = storedRaw.toDate();
+    }
 
-      final shouldUpdate =
-          docId.isNotEmpty &&
-          (storedDate == null || previousDate.isAfter(storedDate));
+    final shouldUpdate =
+        docId.isNotEmpty &&
+        (storedDate == null || previousDate.isAfter(storedDate));
 
-      if (shouldUpdate) {
-        try {
-          await service.updatePreviousMaintenanceDate(docId, previousDate);
-          // Invalidate customerProvider so dashboard re-reads the updated date
-          ref.invalidateSelf();
-        } catch (e) {
-          debugPrint('Auto-sync previousMaintenanceDate failed: $e');
-        }
-      }
+    if (shouldUpdate) {
+        updateRequired = true;
     }
   }
+
+  // ── Check if any pending bookings transition to completed ───────────────
+  // We simulate updating the database here if a record is completed. In reality,
+  // the database itself updates the records. Here we handle syncing the
+  // previous_maintenance_date field when a record is marked completed.
+  
+  if (updateRequired && previousDate != null && customerData != null) {
+      final docId = customerData['docId']?.toString() ?? '';
+      try {
+          // Calculate new next date
+          DateTime updatedNextDate = previousDate.add(const Duration(days: 90));
+
+          await service.updatePreviousMaintenanceDate(docId, previousDate);
+
+          // We also need a service method to update next_maintenance_date
+          // Assuming we add it to firestore_service.dart
+          await service.updateNextMaintenanceDate(docId, updatedNextDate);
+
+          nextDate = updatedNextDate;
+
+          // Invalidate customerProvider so dashboard re-reads the updated date
+          ref.invalidateSelf();
+      } catch (e) {
+          debugPrint('Auto-sync maintenance dates failed: $e');
+      }
+  }
+
   // ─────────────────────────────────────────────────────────────────────────
 
-  // Find explicit future bookings
-  final futureRecords = records.where((r) => r.dateTime.isAfter(now)).toList();
-  if (futureRecords.isNotEmpty) {
-    futureRecords.sort((a, b) => a.dateTime.compareTo(b.dateTime));
-    nextDate = futureRecords.first.dateTime;
-  } else if (previousDate != null) {
-    // No explicit booking → next maintenance is 3 months after last service
-    nextDate = previousDate.add(const Duration(days: 90));
-  } else {
-    nextDate = now.add(const Duration(days: 90));
+  // Default next_maintenance_date logic if null
+  if (nextDate == null) {
+      if (previousDate != null) {
+          // No explicit next date → next maintenance is 90 days after last service
+          nextDate = previousDate.add(const Duration(days: 90));
+      } else {
+          nextDate = now.add(const Duration(days: 90));
+      }
   }
 
   final days = nextDate.difference(now).inDays;

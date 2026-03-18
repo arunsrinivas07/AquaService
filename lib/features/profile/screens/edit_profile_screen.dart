@@ -22,7 +22,7 @@ class EditProfileScreen extends ConsumerStatefulWidget {
 
 class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController _nameController;
-  late TextEditingController _addressController;
+  late List<TextEditingController> _addressControllers;
   late TextEditingController _latLongController;
   late TextEditingController _passwordController;
 
@@ -36,7 +36,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.customer.name);
-    _addressController = TextEditingController(text: widget.customer.address);
+    _addressControllers = widget.customer.addresses.isEmpty
+        ? [TextEditingController()]
+        : widget.customer.addresses
+            .map((addr) => TextEditingController(text: addr))
+            .toList();
     _latLongController = TextEditingController(text: widget.customer.location);
     _passwordController = TextEditingController();
 
@@ -80,6 +84,19 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     }
   }
 
+  void _addAddressField() {
+    setState(() {
+      _addressControllers.add(TextEditingController());
+    });
+  }
+
+  void _removeAddressField(int index) {
+    setState(() {
+      final controller = _addressControllers.removeAt(index);
+      controller.dispose();
+    });
+  }
+
   Future<void> _saveChanges() async {
     setState(() {
       _isLoading = true;
@@ -89,7 +106,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       // Update Customer Details
       final updatedData = {
         'Name': _nameController.text.trim(),
-        'Address': _addressController.text.trim(),
+        'Address': _addressControllers
+            .map((c) => c.text.trim())
+            .where((text) => text.isNotEmpty)
+            .toList(),
         'Location': _latLongController.text.trim(),
       };
       await _firestoreService.updateCustomerProfile(widget.customer.docId, updatedData);
@@ -127,7 +147,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   @override
   void dispose() {
     _nameController.dispose();
-    _addressController.dispose();
+    for (final controller in _addressControllers) {
+      controller.dispose();
+    }
     _latLongController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -207,7 +229,40 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   const SizedBox(height: 16),
                   _buildTextField('Password', _passwordController, obscureText: true),
                   const SizedBox(height: 16),
-                  _buildTextField('Address', _addressController),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Addresses',
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87),
+                      ),
+                      TextButton.icon(
+                        onPressed: _addAddressField,
+                        icon: const Icon(Icons.add, size: 18),
+                        label: const Text('Add'),
+                        style: TextButton.styleFrom(
+                            foregroundColor: const Color(0xFF4DD9E0)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  ...List.generate(_addressControllers.length, (index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: _buildTextField(
+                        'Address ${index + 1}',
+                        _addressControllers[index],
+                        trailing: IconButton(
+                          icon: const Icon(Icons.remove_circle_outline,
+                              color: Colors.redAccent),
+                          onPressed: () => _removeAddressField(index),
+                        ),
+                      ),
+                    );
+                  }),
                   const SizedBox(height: 16),
                   _buildTextField(
                     'Lat/Long Location',

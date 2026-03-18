@@ -81,12 +81,18 @@ class ServiceInfoCard extends ConsumerWidget {
                     ),
                     const SizedBox(width: 5),
                     Text(
-                      'In ${info.daysFromNow} days',
-                      style: const TextStyle(
+                      info.daysFromNow == '0' 
+                          ? 'Today' 
+                          : info.daysFromNow.startsWith('Ove') 
+                              ? info.daysFromNow // Overdue by X
+                              : 'In ${info.daysFromNow} days',
+                      style: TextStyle(
                         fontSize: 14,
                         fontStyle: FontStyle.italic,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
+                        color: info.daysFromNow == '0' || info.daysFromNow.startsWith('Ove') 
+                            ? Colors.red 
+                            : AppColors.textSecondary,
                       ),
                     ),
                   ],

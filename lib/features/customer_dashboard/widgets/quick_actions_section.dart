@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/dashboard_provider.dart';
+import '../../complaints/screens/complaint_bot_screen.dart';
 
 class QuickActionsSection extends ConsumerWidget {
   const QuickActionsSection({super.key});
@@ -59,7 +60,14 @@ class QuickActionsSection extends ConsumerWidget {
                   title: 'Complaint',
                   subtitle: 'Report Issue',
                   icon: Icons.error_outline_rounded,
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ComplaintBotScreen(),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],

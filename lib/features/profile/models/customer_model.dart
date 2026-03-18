@@ -40,7 +40,7 @@ class MachineDetail {
 class CustomerModel {
   final String docId;
   final String name;
-  final String address;
+  final List<String> addresses;
   final String email;
   final String phoneNumber;
   final double initialPayment;
@@ -51,7 +51,7 @@ class CustomerModel {
   const CustomerModel({
     required this.docId,
     required this.name,
-    required this.address,
+    required this.addresses,
     required this.email,
     required this.phoneNumber,
     required this.initialPayment,
@@ -82,7 +82,14 @@ class CustomerModel {
     }
 
     final name = _getField(data, ['Name', 'name', 'CustomerName', 'customerName']);
-    final address = _getField(data, ['Address', 'address']);
+    final addressData = _getField(data, ['Address', 'address']);
+    List<String> addresses = [];
+    if (addressData is List) {
+      addresses = addressData.map((e) => e.toString()).toList();
+    } else if (addressData != null) {
+      addresses = [addressData.toString()];
+    }
+
     final email = _getField(data, ['email', 'Email', 'e-mail']);
     final phone = _getField(data, ['Phone Number', 'PhoneNumber', 'phoneNumber', 'phone']);
     final payment = _getField(data, ['InitialPayment', 'initialPayment', 'Initial Payment']);
@@ -96,7 +103,7 @@ class CustomerModel {
     return CustomerModel(
       docId: data['docId']?.toString() ?? '',
       name: name?.toString() ?? '',
-      address: address?.toString() ?? '',
+      addresses: addresses,
       email: email?.toString() ?? '',
       phoneNumber: phone?.toString() ?? '',
       initialPayment: (payment is num) ? payment.toDouble() : 0,

@@ -25,6 +25,9 @@ class ServiceNotifier extends Notifier<ServiceState> {
 
   void selectMachineModel(String model) =>
       state = state.copyWith(machineModel: model);
+
+  void selectAddress(String address) =>
+      state = state.copyWith(selectedAddress: address);
 }
 
 final serviceProvider = NotifierProvider<ServiceNotifier, ServiceState>(
@@ -32,19 +35,30 @@ final serviceProvider = NotifierProvider<ServiceNotifier, ServiceState>(
 );
 
 // ── Dynamic service info from Firestore ───────────────────────────────────────
-final serviceInfoProvider = Provider<({DateTime date, int daysFromNow})>((ref) {
-  final maintenanceAsync = ref.watch(maintenanceProvider);
-  final maintenance = maintenanceAsync.valueOrNull;
+final serviceInfoProvider = Provider<({DateTime date, String daysFromNow})>((ref) {
+  final maintenanceInfo = ref.watch(maintenanceInfoProvider);
 
-  if (maintenance != null && maintenance.previousMaintenanceDate != null) {
-    final date = maintenance.previousMaintenanceDate!;
-    final daysFromNow = date.difference(DateTime.now()).inDays.abs();
-    return (date: date, daysFromNow: daysFromNow);
+  if (maintenanceInfo.nextDate != null) {
+    final date = maintenanceInfo.nextDate!;
+    final now = DateTime.now();
+    final difference = date.difference(now).inDays;
+    
+    // Create correct display format
+    String daysStr;
+    if (difference < 0) {
+      daysStr = 'Overdue by ${difference.abs()}';
+    } else if (difference == 0) {
+      daysStr = '0'; // Will render as "In 0 days" or similar below
+    } else {
+      daysStr = difference.toString();
+    }
+    
+    return (date: date, daysFromNow: daysStr);
   }
 
   // Fallback
   final date = DateTime.now();
-  return (date: date, daysFromNow: 0);
+  return (date: date, daysFromNow: '0');
 });
 
 // ── Dynamic maintenance info from Firestore ───────────────────────────────────
@@ -52,9 +66,28 @@ final maintenanceInfoProvider = Provider<MaintenanceInfo>((ref) {
   final maintenanceAsync = ref.watch(maintenanceProvider);
   final maintenance = maintenanceAsync.valueOrNull;
 
+  DateTime? prevDate = maintenance?.previousMaintenanceDate;
+  DateTime? dueDate = prevDate != null 
+      ? prevDate.add(const Duration(days: 90)) 
+      : DateTime.now().add(const Duration(days: 90));
+  
+  DateTime? bDate;
+  String? bStatus;
+  
+  if (maintenance != null && maintenance.records.isNotEmpty) {
+      final futureBookings = maintenance.records.where((r) => r.dateTime.isAfter(DateTime.now())).toList();
+      if (futureBookings.isNotEmpty) {
+          futureBookings.sort((a, b) => a.dateTime.compareTo(b.dateTime));
+          bDate = futureBookings.first.dateTime;
+          bStatus = futureBookings.first.status;
+      }
+  }
+
   return MaintenanceInfo(
-    nextDate: maintenance?.nextMaintenanceDate ?? DateTime.now().add(const Duration(days: 90)),
-    previousDate: maintenance?.previousMaintenanceDate ?? DateTime.now().subtract(const Duration(days: 90)),
+    nextDate: dueDate,
+    previousDate: prevDate,
+    bookingDate: bDate,
+    bookingStatus: bStatus,
   );
 });
 
@@ -75,5 +108,14 @@ final machineModelsProvider = Provider<List<String>>((ref) {
       return models.isNotEmpty ? models : ['Unknown Model'];
     },
     orElse: () => ['Loading...'],
+  );
+});
+
+// ── Addresses list ────────────────────────────────────────────────────────────
+final addressListProvider = Provider<List<String>>((ref) {
+  final customerAsync = ref.watch(customerProvider);
+  return customerAsync.maybeWhen(
+    data: (customer) => customer?.addresses ?? [],
+    orElse: () => [],
   );
 });

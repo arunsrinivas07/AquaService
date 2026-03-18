@@ -10,6 +10,7 @@ import '../providers/customer_provider.dart';
 import '../models/customer_model.dart';
 import 'edit_profile_screen.dart';
 import 'machine_payments_screen.dart';
+import '../../complaints/screens/complaint_bot_screen.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -73,7 +74,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           final name = customer?.name ?? 'User';
           final phone = customer?.phoneNumber ?? '';
           final email = customer?.email ?? '';
-          final address = customer?.address ?? '';
+          final addresses = customer?.addresses ?? [];
+          final addressPreview = addresses.isNotEmpty ? addresses.first : '';
           final docId = customer?.docId ?? '';
           final userId = docId.length > 6
               ? '#${docId.substring(0, 6)}'
@@ -93,7 +95,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   userId,
                   phone,
                   email,
-                  address,
+                  addressPreview,
                 ),
                 const SizedBox(height: 16),
 
@@ -121,13 +123,38 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     icon: Icons.location_on_outlined,
                     iconColor: const Color(0xFF4DD9E0),
                     label: 'My Addresses',
-                    expandedContent: address.isNotEmpty
+                    expandedContent: addresses.isNotEmpty
                         ? Padding(
                             padding: const EdgeInsets.fromLTRB(52, 0, 16, 14),
-                            child: Text(
-                              address,
-                              style: const TextStyle(
-                                  fontSize: 13, color: Colors.black87),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: addresses
+                                  .map((addr) => Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 4),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Padding(
+                                              padding: EdgeInsets.only(top: 6),
+                                              child: Icon(Icons.circle,
+                                                  size: 6,
+                                                  color: Color(0xFF4DD9E0)),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: Text(
+                                                addr,
+                                                style: const TextStyle(
+                                                    fontSize: 13,
+                                                    color: Colors.black87),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ))
+                                  .toList(),
                             ),
                           )
                         : const Padding(
@@ -252,7 +279,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       icon: Icons.headset_mic_outlined,
                       iconColor: const Color(0xFF4DD9E0),
                       label: 'Support Center',
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ComplaintBotScreen(),
+                          ),
+                        );
+                      },
                     ),
                     _MenuItem(
                       icon: Icons.language_outlined,

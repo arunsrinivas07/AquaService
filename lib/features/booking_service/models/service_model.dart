@@ -8,6 +8,7 @@ class ServiceState {
   final String?     selectedTime;
   final double      estimateCost;
   final String?     machineModel;
+  final String?     selectedAddress;
 
   const ServiceState({
     this.selectedServiceType = ServiceType.maintenance,
@@ -15,6 +16,7 @@ class ServiceState {
     this.selectedTime,
     this.estimateCost = 200.0,
     this.machineModel,
+    this.selectedAddress,
   });
 
   ServiceState copyWith({
@@ -23,21 +25,27 @@ class ServiceState {
     String?      selectedTime,
     double?      estimateCost,
     String?      machineModel,
+    String?      selectedAddress,
   }) => ServiceState(
     selectedServiceType: selectedServiceType ?? this.selectedServiceType,
     selectedDate:        selectedDate        ?? this.selectedDate,
     selectedTime:        selectedTime        ?? this.selectedTime,
     estimateCost:        estimateCost        ?? this.estimateCost,
     machineModel:        machineModel        ?? this.machineModel,
+    selectedAddress:     selectedAddress     ?? this.selectedAddress,
   );
 }
 
 class MaintenanceInfo {
-  final DateTime nextDate;
-  final DateTime previousDate;
+  final DateTime? nextDate;
+  final DateTime? previousDate;
+  final DateTime? bookingDate;
+  final String? bookingStatus;
 
   const MaintenanceInfo({
-    required this.nextDate,
-    required this.previousDate,
+    this.nextDate,
+    this.previousDate,
+    this.bookingDate,
+    this.bookingStatus,
   });
 }

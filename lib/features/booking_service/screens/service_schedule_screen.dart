@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../profile/screens/profile_screen.dart';
 import '../../../shared/widgets/booking_success_popup.dart';
 import '../../notifications/screens/notifications_screen.dart';
@@ -18,6 +20,7 @@ import '../widgets/estimate_card.dart';
 import '../widgets/maintenance_info_card.dart';
 import '../widgets/schedule_selector.dart';
 import '../widgets/service_info_card.dart';
+import '../widgets/address_selector.dart';
 
 class ServiceScheduleScreen extends ConsumerWidget {
   const ServiceScheduleScreen({super.key});
@@ -93,7 +96,7 @@ class ServiceScheduleScreen extends ConsumerWidget {
 }
 
 // ── Profile header ────────────────────────────────────────────────────────────
-class _ProfileHeader extends StatelessWidget {
+class _ProfileHeader extends ConsumerWidget {
   final String name;
   final String userId;
   final String avatarUrl;
@@ -105,7 +108,7 @@ class _ProfileHeader extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -120,15 +123,33 @@ class _ProfileHeader extends StatelessWidget {
             child: CircleAvatar(
               radius: 24,
               backgroundColor: Colors.deepPurple.shade100,
-              child: ClipOval(
-                child: Image.asset(
-                  'assets/images/avatar.jpeg',
-                  fit: BoxFit.cover,
-                  width: 48,
-                  height: 48,
-                  errorBuilder: (_, __, ___) =>
-                      const Icon(Icons.person, color: Colors.deepPurple),
-                ),
+              child: FutureBuilder<SharedPreferences>(
+                future: SharedPreferences.getInstance(),
+                builder: (context, snapshot) {
+                  final authState = ref.read(authProvider);
+                  final phone = authState.loggedInPhone ?? '';
+                  String? localPic;
+                  if (snapshot.hasData && phone.isNotEmpty) {
+                    localPic = snapshot.data!.getString('profile_pic_$phone');
+                  }
+                  return ClipOval(
+                    child: localPic != null && File(localPic).existsSync()
+                        ? Image.file(
+                            File(localPic),
+                            fit: BoxFit.cover,
+                            width: 48,
+                            height: 48,
+                          )
+                        : Image.asset(
+                            'assets/images/avatar.jpeg',
+                            fit: BoxFit.cover,
+                            width: 48,
+                            height: 48,
+                            errorBuilder: (_, __, ___) =>
+                                const Icon(Icons.person, color: Colors.deepPurple),
+                          ),
+                  );
+                },
               ),
             ),
           ),
@@ -264,8 +285,10 @@ class _ScheduleSection extends StatelessWidget {
               color: AppColors.textPrimary,
             ),
           ),
-          SizedBox(height: AppSpacing.md),
-          ScheduleSelector(),
+          const SizedBox(height: AppSpacing.md),
+          const ScheduleSelector(),
+          const SizedBox(height: AppSpacing.lg),
+          const AddressSelector(),
         ],
       ),
     );
@@ -304,12 +327,13 @@ class _ConfirmButtonState extends ConsumerState<_ConfirmButton> {
             : 'installation';
 
         final firestore = FirestoreService();
-        await firestore.addMaintenanceBooking(
-          phone: phone,
-          dateTime: dateTime ?? DateTime.now(),
-          machineModel: machineModel,
-          serviceType: serviceType,
-        );
+          await firestore.addMaintenanceBooking(
+            phone: phone,
+            dateTime: dateTime ?? DateTime.now(),
+            machineModel: machineModel,
+            serviceType: serviceType,
+            address: serviceState.selectedAddress,
+          );
         
         // Refresh maintenance provider so new booking reflects on dashboard
         ref.invalidate(maintenanceProvider);

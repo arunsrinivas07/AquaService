@@ -37,6 +37,8 @@ class DashboardNotifier extends StateNotifier<DashboardState> {
     double? outstandingBalance,
     DateTime? nextServiceDate,
     String? serviceCountdown,
+    DateTime? bookingDate,
+    String? bookingStatus,
     double? tdsValue,
     bool? isHealthy,
   }) {
@@ -47,6 +49,8 @@ class DashboardNotifier extends StateNotifier<DashboardState> {
       outstandingBalance: outstandingBalance,
       nextServiceDate: nextServiceDate,
       serviceCountdown: serviceCountdown,
+      bookingDate: bookingDate,
+      bookingStatus: bookingStatus,
       tdsValue: tdsValue,
       isHealthy: isHealthy,
     );
@@ -101,10 +105,23 @@ final dashboardProvider =
     final calculatedTds = 100.0 + (daysSince / 90.0) * 450.0;
     final isHealthy = calculatedTds < 500;
 
+    DateTime? bDate;
+    String? bStatus;
+    if (maintenance.records.isNotEmpty) {
+        final futureBookings = maintenance.records.where((r) => r.dateTime.isAfter(now)).toList();
+        if (futureBookings.isNotEmpty) {
+            futureBookings.sort((a, b) => a.dateTime.compareTo(b.dateTime));
+            bDate = futureBookings.first.dateTime;
+            bStatus = futureBookings.first.status;
+        }
+    }
+
     Future.microtask(() {
       notifier.updateFromFirestore(
         nextServiceDate: maintenance.nextMaintenanceDate,
         serviceCountdown: maintenance.serviceCountdown,
+        bookingDate: bDate,
+        bookingStatus: bStatus,
         tdsValue: calculatedTds,
         isHealthy: isHealthy,
       );

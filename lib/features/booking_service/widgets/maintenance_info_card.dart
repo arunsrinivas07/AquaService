@@ -26,11 +26,16 @@ class MaintenanceInfoCard extends ConsumerWidget {
     'Dec',
   ];
 
-  String _fmt(DateTime d) => '${d.day} ${_months[d.month]} ${d.year}';
+  String _fmt(DateTime? d) => d == null ? 'N/A' : '${d.day} ${_months[d.month]} ${d.year}';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final info = ref.watch(maintenanceInfoProvider);
+
+    String bookingText = 'No maintenance scheduled';
+    if (info.bookingDate != null) {
+      bookingText = '${info.bookingStatus?.toUpperCase() ?? "SCHEDULED"} on ${_fmt(info.bookingDate)}';
+    }
 
     return AppCard(
       isGlassy: true,
@@ -41,7 +46,12 @@ class MaintenanceInfoCard extends ConsumerWidget {
           _InfoRow(label: 'Next Maintenance Date', value: _fmt(info.nextDate)),
           const SizedBox(height: AppSpacing.lg),
           _InfoRow(
-            label: 'Previous Maintenance date',
+            label: 'Current Booking Status',
+            value: bookingText,
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          _InfoRow(
+            label: 'Previous Maintenance Date',
             value: _fmt(info.previousDate),
           ),
         ],

@@ -10,10 +10,17 @@ class ServiceCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final dashboardState = ref.watch(dashboardProvider);
-    final nextDate = dashboardState.nextServiceDate;
+    
+    final bool hasBooking = dashboardState.bookingDate != null;
+    final displayDate = hasBooking ? dashboardState.bookingDate! : dashboardState.nextServiceDate;
+    final String titleText = hasBooking ? 'Current Booking' : 'Next Service';
+    
+    String serviceCountdown = dashboardState.serviceCountdown;
+    if (hasBooking) {
+      serviceCountdown = '${dashboardState.bookingStatus?.toUpperCase() ?? "SCHEDULED"}';
+    }
 
-    final String serviceCountdown = dashboardState.serviceCountdown;
-    final formattedDate = DateFormat('EEEE, MMMM d').format(nextDate);
+    final formattedDate = DateFormat('EEEE, MMMM d').format(displayDate);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -30,7 +37,7 @@ class ServiceCard extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Next Service',
+            titleText,
             style: TextStyle(
               fontSize: 13,
               color: Colors.grey.shade600,
@@ -80,9 +87,9 @@ class ServiceCard extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Icon(
-                    Icons.info_outline,
-                    size: 14,
-                    color: Colors.black45,
+                     Icons.info_outline,
+                     size: 14,
+                     color: Colors.black45,
                   ),
                   const SizedBox(width: 4),
                   Text(
@@ -93,7 +100,8 @@ class ServiceCard extends ConsumerWidget {
                       fontWeight: FontWeight.w600,
                       color: serviceCountdown == 'Today' ||
                               serviceCountdown.contains('0') ||
-                              serviceCountdown.contains('overdue')
+                              serviceCountdown.contains('overdue') ||
+                              serviceCountdown == 'PENDING'
                           ? Colors.red
                           : Colors.black54,
                     ),

@@ -69,6 +69,12 @@ class FirestoreService {
     });
   }
 
+  Future<void> updateNextMaintenanceDate(String docId, DateTime date) async {
+    await _db.collection('CustomerDetails').doc(docId).update({
+      'next_maintenance_date': Timestamp.fromDate(date),
+    });
+  }
+
   Future<void> updateCustomerPassword(String phone, String newPassword) async {
     final phoneNum = int.tryParse(phone);
     final snap = await _db
@@ -128,6 +134,7 @@ class FirestoreService {
     required DateTime dateTime,
     required String machineModel,
     required String serviceType,
+    String? address,
   }) async {
     final phoneNum = int.tryParse(phone);
     await _db.collection('maintance_Installation').add({
@@ -135,6 +142,7 @@ class FirestoreService {
       'date_time': Timestamp.fromDate(dateTime),
       'machine Model': machineModel,
       'service_type': serviceType,
+      'address': address ?? '',
       'status': 'pending',
     });
   }

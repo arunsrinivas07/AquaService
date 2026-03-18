@@ -12,6 +12,8 @@ class DashboardState {
   final double outstandingBalance;
   final DateTime nextServiceDate;
   final String serviceCountdown;
+  final DateTime? bookingDate;
+  final String? bookingStatus;
   final int currentNavIndex;
 
   const DashboardState({
@@ -23,6 +25,8 @@ class DashboardState {
     required this.outstandingBalance,
     required this.nextServiceDate,
     required this.serviceCountdown,
+    this.bookingDate,
+    this.bookingStatus,
     required this.currentNavIndex,
   });
 
@@ -35,6 +39,8 @@ class DashboardState {
     double? outstandingBalance,
     DateTime? nextServiceDate,
     String? serviceCountdown,
+    DateTime? bookingDate,
+    String? bookingStatus,
     int? currentNavIndex,
   }) {
     return DashboardState(
@@ -46,6 +52,8 @@ class DashboardState {
       outstandingBalance: outstandingBalance ?? this.outstandingBalance,
       nextServiceDate: nextServiceDate ?? this.nextServiceDate,
       serviceCountdown: serviceCountdown ?? this.serviceCountdown,
+      bookingDate: bookingDate ?? this.bookingDate,
+      bookingStatus: bookingStatus ?? this.bookingStatus,
       currentNavIndex: currentNavIndex ?? this.currentNavIndex,
     );
   }

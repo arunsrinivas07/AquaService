@@ -1,11 +1,14 @@
 // lib/features/status/screens/status_screen.dart
 
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/services/firestore_service.dart';
 import '../../booking_service/providers/maintenance_provider.dart';
+import '../../login/providers/auth_provider.dart';
 import '../providers/complaint_provider.dart';
 
 class StatusScreen extends ConsumerWidget {
@@ -35,7 +38,7 @@ class StatusScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildHeader(context),
+              _buildHeader(context, ref),
               Expanded(
                 child: CustomScrollView(
                   physics: const BouncingScrollPhysics(),
@@ -79,7 +82,7 @@ class StatusScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -87,15 +90,33 @@ class StatusScreen extends ConsumerWidget {
           CircleAvatar(
             radius: 24,
             backgroundColor: Colors.deepPurple.shade100,
-            child: ClipOval(
-              child: Image.asset(
-                'assets/images/avatar.jpeg',
-                fit: BoxFit.cover,
-                width: 48,
-                height: 48,
-                errorBuilder: (_, __, ___) =>
-                    const Icon(Icons.person, color: Colors.deepPurple),
-              ),
+            child: FutureBuilder<SharedPreferences>(
+              future: SharedPreferences.getInstance(),
+              builder: (context, snapshot) {
+                final authState = ref.read(authProvider);
+                final phone = authState.loggedInPhone ?? '';
+                String? localPic;
+                if (snapshot.hasData && phone.isNotEmpty) {
+                  localPic = snapshot.data!.getString('profile_pic_$phone');
+                }
+                return ClipOval(
+                  child: localPic != null && File(localPic).existsSync()
+                      ? Image.file(
+                          File(localPic),
+                          fit: BoxFit.cover,
+                          width: 48,
+                          height: 48,
+                        )
+                      : Image.asset(
+                          'assets/images/avatar.jpeg',
+                          fit: BoxFit.cover,
+                          width: 48,
+                          height: 48,
+                          errorBuilder: (_, __, ___) =>
+                              const Icon(Icons.person, color: Colors.deepPurple),
+                        ),
+                );
+              },
             ),
           ),
           const SizedBox(width: 12),
@@ -135,6 +156,7 @@ class StatusScreen extends ConsumerWidget {
               date: record.dateTime,
               status: record.status,
               collection: 'maintance_Installation',
+              address: record.address,
             );
           }, childCount: summary.records.length),
         );
@@ -202,6 +224,7 @@ class _StatusCard extends ConsumerStatefulWidget {
   final DateTime date;
   final String status;
   final String collection;
+  final String? address;
 
   const _StatusCard({
     required this.type,
@@ -210,6 +233,7 @@ class _StatusCard extends ConsumerStatefulWidget {
     required this.date,
     required this.status,
     required this.collection,
+    this.address,
   });
 
   @override
@@ -347,6 +371,30 @@ class _StatusCardState extends ConsumerState<_StatusCard> {
               ),
             ],
           ),
+          if (widget.address != null && widget.address!.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.location_on_outlined,
+                  size: 16,
+                  color: Colors.grey.shade600,
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    widget.address!,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey.shade700,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
           if (isPending) ...[
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 12),

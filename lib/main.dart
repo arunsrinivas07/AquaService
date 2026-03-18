@@ -2,15 +2,22 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'features/customer_dashboard/providers/dashboard_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'features/customer_dashboard/screens/customer_dashboard_page.dart';
 import 'features/booking_service/screens/service_schedule_screen.dart';
 import 'features/machines/screens/machine_payments_screen.dart';
 import 'features/splash/screens/splash_screen.dart';
+import 'features/status/screens/status_screen.dart';
 import 'shared/widgets/navbar/navbar.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const ProviderScope(child: AquaPureApp()));
 }
 
@@ -39,7 +46,7 @@ class MainScreen extends ConsumerWidget {
     ServiceScheduleScreen(), // Index 0: Book Service
     MachinePaymentsScreen(), // Index 1: Payment / Due
     CustomerDashboardPage(), // Index 2: Home
-    Center(child: Text("Status Page")), // Index 3: Status
+    StatusScreen(),          // Index 3: Status
   ];
 
   @override

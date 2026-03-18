@@ -15,8 +15,8 @@ class MachinePaymentsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final payment = ref.watch(paymentProvider);
-    final machines = ref.watch(machineListProvider);
+    final paymentAsync = ref.watch(paymentProvider);
+    final machinesAsync = ref.watch(machineListProvider);
 
     return Scaffold(
       body: Container(
@@ -39,63 +39,82 @@ class MachinePaymentsScreen extends ConsumerWidget {
               final isTablet = constraints.maxWidth > 600;
               final hPad = isTablet ? AppSpacing.xxl : AppSpacing.base;
 
-              return Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: hPad),
-                    child: ProfileHeader(
-                      name: payment.userName,
-                      userId: payment.userId,
-                      avatarUrl: payment.avatarUrl,
-                    ),
-                  ),
-                  Expanded(
-                    child: ListView(
-                      physics: const BouncingScrollPhysics(),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: hPad,
-                        vertical: AppSpacing.sm,
+              return paymentAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Center(child: Text('Error: $e')),
+                data: (payment) {
+                  final machines = machinesAsync.valueOrNull ?? [];
+
+                  return Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: hPad),
+                        child: ProfileHeader(
+                          name: payment.userName,
+                          userId: payment.userId,
+                          avatarUrl: payment.avatarUrl,
+                        ),
                       ),
-                      children: [
-                        const SizedBox(height: AppSpacing.xs),
-                        BalanceCard(
-                          amount: payment.outstandingBalance,
-                          dueDays: payment.dueDays,
-                          onPayNow: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const PaymentSourceScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-                        const Padding(
-                          padding: EdgeInsets.only(left: 4, bottom: 12),
-                          child: Text(
-                            'Your Machines',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                      Expanded(
+                        child: ListView(
+                          physics: const BouncingScrollPhysics(),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: hPad,
+                            vertical: AppSpacing.sm,
                           ),
+                          children: [
+                            const SizedBox(height: AppSpacing.xs),
+                            BalanceCard(
+                              amount: payment.outstandingBalance,
+                              dueDays: payment.dueDays,
+                              onPayNow: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const PaymentSourceScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                            const SizedBox(height: AppSpacing.lg),
+                            const Padding(
+                              padding: EdgeInsets.only(left: 4, bottom: 12),
+                              child: Text(
+                                'Your Machines',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            if (machines.isEmpty)
+                              const Padding(
+                                padding: EdgeInsets.all(20),
+                                child: Center(
+                                  child: Text(
+                                    'No machines found',
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
+                                ),
+                              )
+                            else
+                              ListView.separated(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: machines.length,
+                                separatorBuilder: (_, __) =>
+                                    const SizedBox(height: AppSpacing.base),
+                                itemBuilder: (context, index) =>
+                                    MachineCard(machine: machines[index]),
+                              ),
+                            const SizedBox(height: AppSpacing.base),
+                          ],
                         ),
-                        ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: machines.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(height: AppSpacing.base),
-                          itemBuilder: (context, index) =>
-                              MachineCard(machine: machines[index]),
-                        ),
-                        const SizedBox(height: AppSpacing.base),
-                      ],
-                    ),
-                  ),
-                ],
+                      ),
+                    ],
+                  );
+                },
               );
             },
           ),

@@ -1,7 +1,10 @@
 // lib/features/customer_dashboard/presentation/widgets/header_section.dart
 
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../login/providers/auth_provider.dart';
 import '../../profile/screens/profile_screen.dart';
 import '../../notifications/screens/notifications_screen.dart';
 import '../providers/dashboard_provider.dart';
@@ -24,33 +27,50 @@ class HeaderSection extends ConsumerWidget {
                 MaterialPageRoute(builder: (context) => const ProfileScreen()),
               );
             },
-            child: CircleAvatar(
-              radius: 24,
-              backgroundColor: Colors.deepPurple.shade100,
-              child: ClipOval(
-                child: Image.network(
-                  'https://i.pravatar.cc/100?u=$userName',
-                  fit: BoxFit.cover,
-                  width: 48,
-                  height: 48,
-                  errorBuilder: (_, __, ___) =>
-                      const Icon(Icons.person, color: Colors.deepPurple),
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2),
+              ),
+              child: CircleAvatar(
+                radius: 24,
+                backgroundColor: Colors.deepPurple.shade100,
+                child: FutureBuilder<SharedPreferences>(
+                  future: SharedPreferences.getInstance(),
+                  builder: (context, snapshot) {
+                    final authState = ref.read(authProvider);
+                    final phone = authState.loggedInPhone ?? '';
+                    String? localPic;
+                    if (snapshot.hasData && phone.isNotEmpty) {
+                      localPic = snapshot.data!.getString('profile_pic_$phone');
+                    }
+                    return ClipOval(
+                      child: localPic != null && File(localPic).existsSync()
+                          ? Image.file(
+                              File(localPic),
+                              fit: BoxFit.cover,
+                              width: 48,
+                              height: 48,
+                            )
+                          : Image.asset(
+                              'assets/images/avatar.jpeg',
+                              fit: BoxFit.cover,
+                              width: 48,
+                              height: 48,
+                              errorBuilder: (_, __, ___) =>
+                                  const Icon(Icons.person, color: Colors.deepPurple),
+                            ),
+                    );
+                  },
                 ),
               ),
             ),
           ),
+          const SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                'Good Morning,',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.grey.shade600,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
               Text(
                 userName,
                 style: const TextStyle(

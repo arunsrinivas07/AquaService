@@ -1,7 +1,9 @@
-// lib/features/service/providers/service_provider.dart
+// lib/features/booking_service/providers/service_provider.dart
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/service_model.dart';
+import 'maintenance_provider.dart';
+import '../../profile/providers/customer_provider.dart';
 
 // ── State notifier ────────────────────────────────────────────────────────────
 class ServiceNotifier extends Notifier<ServiceState> {
@@ -29,22 +31,49 @@ final serviceProvider = NotifierProvider<ServiceNotifier, ServiceState>(
   ServiceNotifier.new,
 );
 
-// ── Static service info ───────────────────────────────────────────────────────
+// ── Dynamic service info from Firestore ───────────────────────────────────────
 final serviceInfoProvider = Provider<({DateTime date, int daysFromNow})>((ref) {
-  final date = DateTime(2025, 2, 28);
-  final daysFromNow = date.difference(DateTime.now()).inDays.abs();
-  return (date: date, daysFromNow: daysFromNow);
+  final maintenanceAsync = ref.watch(maintenanceProvider);
+  final maintenance = maintenanceAsync.valueOrNull;
+
+  if (maintenance != null && maintenance.previousMaintenanceDate != null) {
+    final date = maintenance.previousMaintenanceDate!;
+    final daysFromNow = date.difference(DateTime.now()).inDays.abs();
+    return (date: date, daysFromNow: daysFromNow);
+  }
+
+  // Fallback
+  final date = DateTime.now();
+  return (date: date, daysFromNow: 0);
 });
 
-// ── Maintenance info ─────────────────────────────────────────────────────────
-final maintenanceInfoProvider = Provider<MaintenanceInfo>(
-  (ref) => MaintenanceInfo(
-    nextDate: DateTime(2026, 1, 31),
-    previousDate: DateTime(2025, 12, 12),
-  ),
-);
+// ── Dynamic maintenance info from Firestore ───────────────────────────────────
+final maintenanceInfoProvider = Provider<MaintenanceInfo>((ref) {
+  final maintenanceAsync = ref.watch(maintenanceProvider);
+  final maintenance = maintenanceAsync.valueOrNull;
+
+  return MaintenanceInfo(
+    nextDate: maintenance?.nextMaintenanceDate ?? DateTime.now().add(const Duration(days: 90)),
+    previousDate: maintenance?.previousMaintenanceDate ?? DateTime.now().subtract(const Duration(days: 90)),
+  );
+});
 
 // ── Machine models list ───────────────────────────────────────────────────────
-final machineModelsProvider = Provider<List<String>>(
-  (_) => ['HVAC-X100', 'HVAC-X200', 'ChillPro 3000', 'ArcticFlow 500'],
-);
+final machineModelsProvider = Provider<List<String>>((ref) {
+  final customerAsync = ref.watch(customerProvider);
+  
+  return customerAsync.maybeWhen(
+    data: (customer) {
+      if (customer == null || customer.machineDetails.isEmpty) {
+        return ['No Machine Registered'];
+      }
+      final models = customer.machineDetails
+          .map((m) => m.model)
+          .where((m) => m.isNotEmpty)
+          .toList();
+          
+      return models.isNotEmpty ? models : ['Unknown Model'];
+    },
+    orElse: () => ['Loading...'],
+  );
+});

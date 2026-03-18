@@ -6,9 +6,14 @@ import '../../notifications/screens/notifications_screen.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../shared/widgets/app_chip.dart';
+
 import '../../payments/providers/payment_provider.dart';
+import '../../profile/providers/customer_provider.dart';
+import '../../login/providers/auth_provider.dart';
+import '../../../core/services/firestore_service.dart';
 import '../models/service_model.dart';
 import '../providers/service_provider.dart';
+import '../providers/maintenance_provider.dart';
 import '../widgets/estimate_card.dart';
 import '../widgets/maintenance_info_card.dart';
 import '../widgets/schedule_selector.dart';
@@ -19,7 +24,12 @@ class ServiceScheduleScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final payment = ref.watch(paymentProvider);
+    final customerAsync = ref.watch(customerProvider);
+    final customer = customerAsync.valueOrNull;
+    final userName = customer?.name ?? 'User';
+    final userId = customer != null
+        ? '#${customer.docId.substring(0, customer.docId.length > 6 ? 6 : customer.docId.length)}'
+        : '';
 
     return Scaffold(
       body: Container(
@@ -45,9 +55,9 @@ class ServiceScheduleScreen extends ConsumerWidget {
               return Column(
                 children: [
                   _ProfileHeader(
-                    name: payment.userName,
-                    userId: payment.userId,
-                    avatarUrl: payment.avatarUrl,
+                    name: userName,
+                    userId: userId,
+                    avatarUrl: '',
                   ),
                   Expanded(
                     child: ListView(
@@ -111,8 +121,8 @@ class _ProfileHeader extends StatelessWidget {
               radius: 24,
               backgroundColor: Colors.deepPurple.shade100,
               child: ClipOval(
-                child: Image.network(
-                  avatarUrl,
+                child: Image.asset(
+                  'assets/images/avatar.jpeg',
                   fit: BoxFit.cover,
                   width: 48,
                   height: 48,
@@ -263,11 +273,66 @@ class _ScheduleSection extends StatelessWidget {
 }
 
 // ── Confirm button ────────────────────────────────────────────────────────────
-class _ConfirmButton extends ConsumerWidget {
+class _ConfirmButton extends ConsumerStatefulWidget {
   const _ConfirmButton();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_ConfirmButton> createState() => _ConfirmButtonState();
+}
+
+class _ConfirmButtonState extends ConsumerState<_ConfirmButton> {
+  bool _isLoading = false;
+
+  void _confirmBooking() async {
+    setState(() => _isLoading = true);
+    
+    try {
+      final authState = ref.read(authProvider);
+      final phone = authState.loggedInPhone;
+      
+      if (phone != null) {
+        final serviceState = ref.read(serviceProvider);
+        // We need machine type/model and date. Combine date and time
+        // Note: For simplicity we just use the selectedDate here
+        final dateTime = serviceState.selectedDate;
+        
+        // Machine model from state, fallback to generic
+        final machineModel = serviceState.machineModel ?? 'Unknown Machine';
+        
+        final serviceType = serviceState.selectedServiceType == ServiceType.maintenance
+            ? 'maintenance'
+            : 'installation';
+
+        final firestore = FirestoreService();
+        await firestore.addMaintenanceBooking(
+          phone: phone,
+          dateTime: dateTime ?? DateTime.now(),
+          machineModel: machineModel,
+          serviceType: serviceType,
+        );
+        
+        // Refresh maintenance provider so new booking reflects on dashboard
+        ref.invalidate(maintenanceProvider);
+      }
+      
+      if (mounted) {
+        BookingSuccessPopup.show(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to book service: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
@@ -286,29 +351,38 @@ class _ConfirmButton extends ConsumerWidget {
           color: Colors.cyan.shade100,
           borderRadius: BorderRadius.circular(12),
           child: InkWell(
-            onTap: () {
-              BookingSuccessPopup.show(context);
-            },
+            onTap: _isLoading ? null : _confirmBooking,
             borderRadius: BorderRadius.circular(12),
-            child: const Padding(
-              padding: EdgeInsets.symmetric(vertical: 13),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 13),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    'Confirm Schedule',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black87,
+                  if (_isLoading)
+                    const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.black87,
+                      ),
+                    )
+                  else ...[
+                    const Text(
+                      'Confirm Schedule',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black87,
+                      ),
                     ),
-                  ),
-                  SizedBox(width: 6),
-                  Icon(
-                    Icons.arrow_forward_rounded,
-                    size: 18,
-                    color: Colors.black54,
-                  ),
+                    const SizedBox(width: 6),
+                    const Icon(
+                      Icons.arrow_forward_rounded,
+                      size: 18,
+                      color: Colors.black54,
+                    ),
+                  ],
                 ],
               ),
             ),

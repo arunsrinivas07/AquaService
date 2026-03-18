@@ -1,15 +1,18 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../login/screens/login_screen.dart';
+import '../../login/providers/auth_provider.dart';
+import '../../../main.dart'; // For MainScreen
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
+class _SplashScreenState extends ConsumerState<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
@@ -84,16 +87,29 @@ class _SplashScreenState extends State<SplashScreen>
           ),
         );
 
+    // Check persistent login immediately on load
+    Future.microtask(() {
+      ref.read(authProvider.notifier).checkAuthStatus();
+    });
+
     // Start the complete animation sequence
     _controller.forward();
 
     // Set a timer for the total sequence duration (2.5s) + the hold duration (0.5s)
     Timer(const Duration(milliseconds: 3000), () {
       if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
-        );
+        final authState = ref.read(authProvider);
+        if (authState.isLoggedIn) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const MainScreen()),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
+          );
+        }
       }
     });
   }

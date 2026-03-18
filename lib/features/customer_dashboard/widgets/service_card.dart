@@ -1,56 +1,45 @@
-import '../../booking_service/screens/service_schedule_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../providers/dashboard_provider.dart';
+import '../../booking_service/screens/service_schedule_screen.dart';
 
 class ServiceCard extends ConsumerWidget {
   const ServiceCard({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final nextServiceDate = ref.watch(
-      dashboardProvider.select((s) => s.nextServiceDate),
-    );
-    final serviceCountdown = ref.watch(
-      dashboardProvider.select((s) => s.serviceCountdown),
-    );
+    final dashboardState = ref.watch(dashboardProvider);
+    final nextDate = dashboardState.nextServiceDate;
 
-    final formattedDate = DateFormat('EEEE, MMMM d').format(nextServiceDate);
+    final String serviceCountdown = dashboardState.serviceCountdown;
+    final formattedDate = DateFormat('EEEE, MMMM d').format(nextDate);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.72),
-        borderRadius: BorderRadius.circular(25),
+        color: const Color(0xFFE8F5E9),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: const Color(0xFFB3E5FC).withOpacity(0.35),
-          width: 1,
+          color: const Color(0xFFA5D6A7),
+          width: 1.5,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 10,
-            spreadRadius: 0,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Service Booked Info',
+            'Next Service',
             style: TextStyle(
               fontSize: 13,
-              color: Colors.grey.shade500,
-              fontWeight: FontWeight.w500,
+              color: Colors.grey.shade600,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
             ),
           ),
           const SizedBox(height: 8),
           Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
                 child: Text(
@@ -58,33 +47,35 @@ class ServiceCard extends ConsumerWidget {
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
+                    color: Colors.black87,
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(right: 6),
-                child: Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.handyman_outlined,
-                    size: 20,
-                    color: Colors.black54,
-                  ),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.green.shade200.withOpacity(0.5),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.build_circle,
+                  color: Color(0xFF4CAF50),
+                  size: 28,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 14),
-          // "In 15 days" text + Book a Service button on same row
+          const SizedBox(height: 20),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Countdown text
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -96,65 +87,49 @@ class ServiceCard extends ConsumerWidget {
                   const SizedBox(width: 4),
                   Text(
                     serviceCountdown,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
                       fontStyle: FontStyle.italic,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black54,
+                      color: serviceCountdown == 'Today' ||
+                              serviceCountdown.contains('0') ||
+                              serviceCountdown.contains('overdue')
+                          ? Colors.red
+                          : Colors.black54,
                     ),
                   ),
                 ],
               ),
               const Spacer(),
-              // Book a Service button — same fixed width as Pay Now
               SizedBox(
-                width: MediaQuery.of(context).size.width * 0.55,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.cyan.shade200.withOpacity(0.5),
-                        blurRadius: 10,
-                        spreadRadius: 0,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Material(
-                    color: Colors.cyan.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ServiceScheduleScreen(),
-                          ),
-                        );
-                      },
-                      borderRadius: BorderRadius.circular(12),
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 13),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Book a Service',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            SizedBox(width: 6),
-                            Icon(
-                              Icons.arrow_forward_rounded,
-                              size: 18,
-                              color: Colors.black54,
-                            ),
-                          ],
+                width: 140,
+                child: Material(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(12),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ServiceScheduleScreen(),
                         ),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(12),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 13),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Book a Service',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -162,6 +137,7 @@ class ServiceCard extends ConsumerWidget {
               ),
             ],
           ),
+
         ],
       ),
     );

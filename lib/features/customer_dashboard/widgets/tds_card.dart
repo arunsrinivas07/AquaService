@@ -15,10 +15,29 @@ class TdsCard extends ConsumerWidget {
       dashboardProvider.select((s) => s.modelNumber),
     );
     final tdsValue = ref.watch(dashboardProvider.select((s) => s.tdsValue));
-    final isHealthy = ref.watch(dashboardProvider.select((s) => s.isHealthy));
 
-    const double maxTds = 500;
-    final double progress = (tdsValue / maxTds).clamp(0.0, 1.0);
+    const double maxTds = 550;
+    const double minTds = 100;
+    
+    // Calculate progress as a percentage between 100 and 550
+    final double progress = ((tdsValue - minTds) / (maxTds - minTds)).clamp(0.0, 1.0);
+
+    // Determine color based on progress (green -> orange -> red)
+    Color progressColor;
+    if (progress < 0.5) {
+      // 100 - 325
+      progressColor = Colors.cyan.shade400; // Keep their initial green/cyan style
+    } else if (progress < 0.8) {
+      // 325 - 460
+      progressColor = Colors.orange;
+    } else {
+      // 460+
+      progressColor = Colors.red;
+    }
+    
+    // Text changes
+    final String statusText = tdsValue < 400 ? 'System Healthy' : (tdsValue < 500 ? 'Maintenance Due Soon' : 'Action Required');
+    final Color statusColor = tdsValue < 400 ? Colors.green : (tdsValue < 500 ? Colors.orange : Colors.red);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -59,16 +78,16 @@ class TdsCard extends ConsumerWidget {
                     width: 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      color: isHealthy ? Colors.green : Colors.red,
+                      color: statusColor,
                       shape: BoxShape.circle,
                     ),
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    isHealthy ? 'System Healthy' : 'Action Required',
+                    statusText,
                     style: TextStyle(
                       fontSize: 12,
-                      color: isHealthy ? Colors.green : Colors.red,
+                      color: statusColor,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -114,13 +133,13 @@ class TdsCard extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 10),
+          // Dynamic Progress Bar
           Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
               boxShadow: [
                 BoxShadow(
-                  color: (isHealthy ? Colors.cyan.shade300 : Colors.orange)
-                      .withOpacity(0.45),
+                  color: progressColor.withOpacity(0.45),
                   blurRadius: 10,
                   spreadRadius: 1,
                   offset: const Offset(0, 2),
@@ -133,9 +152,7 @@ class TdsCard extends ConsumerWidget {
                 value: progress,
                 minHeight: 8,
                 backgroundColor: Colors.grey.shade200,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  isHealthy ? Colors.cyan.shade300 : Colors.orange,
-                ),
+                valueColor: AlwaysStoppedAnimation<Color>(progressColor),
               ),
             ),
           ),

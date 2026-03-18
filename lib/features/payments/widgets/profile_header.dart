@@ -31,8 +31,8 @@ class ProfileHeader extends StatelessWidget {
               radius: 24,
               backgroundColor: Colors.deepPurple.shade100,
               child: ClipOval(
-                child: Image.network(
-                  avatarUrl,
+                child: Image.asset(
+                  'assets/images/avatar.jpeg',
                   fit: BoxFit.cover,
                   width: 48,
                   height: 48,

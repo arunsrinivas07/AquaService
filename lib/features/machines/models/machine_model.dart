@@ -6,6 +6,7 @@ class MachineModel {
   final String id;
   final String name;
   final String serialNumber;
+  final String model;
   final String date;
   final String imageUrl;
   final MachineStatus status;
@@ -14,6 +15,7 @@ class MachineModel {
     required this.id,
     required this.name,
     required this.serialNumber,
+    this.model = '',
     required this.date,
     required this.imageUrl,
     required this.status,

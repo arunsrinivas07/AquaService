@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import '../../profile/providers/customer_provider.dart';
+import '../providers/payment_provider.dart';
 
-class PaymentSourceScreen extends StatefulWidget {
+class PaymentSourceScreen extends ConsumerStatefulWidget {
   const PaymentSourceScreen({super.key});
 
   @override
-  State<PaymentSourceScreen> createState() => _PaymentSourceScreenState();
+  ConsumerState<PaymentSourceScreen> createState() => _PaymentSourceScreenState();
 }
 
-class _PaymentSourceScreenState extends State<PaymentSourceScreen> {
+class _PaymentSourceScreenState extends ConsumerState<PaymentSourceScreen> {
   bool isCashSelected = true;
   late TextEditingController _amountController;
 
   @override
   void initState() {
     super.initState();
-    _amountController = TextEditingController(text: "4,250.00");
+    _amountController = TextEditingController(text: "0.00");
   }
 
   @override
@@ -26,6 +29,19 @@ class _PaymentSourceScreenState extends State<PaymentSourceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final paymentAsync = ref.watch(paymentProvider);
+    final customerAsync = ref.watch(customerProvider);
+
+    final payment = paymentAsync.valueOrNull;
+    final customer = customerAsync.valueOrNull;
+    final customerName = customer?.name ?? 'Customer';
+    final totalAmount = payment?.outstandingBalance ?? 0;
+
+    // Update controller if not manually edited
+    if (_amountController.text == '0.00' && totalAmount > 0) {
+      _amountController.text = totalAmount.toStringAsFixed(2);
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFFEAF6F6),
       body: SafeArea(
@@ -39,11 +55,11 @@ class _PaymentSourceScreenState extends State<PaymentSourceScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 20),
-                    _buildTotalAmountCard(),
+                    _buildTotalAmountCard(totalAmount),
                     const SizedBox(height: 30),
-                    _buildQRCodeSection(),
+                    _buildQRCodeSection(totalAmount),
                     const SizedBox(height: 30),
-                    _buildPaymentCard(),
+                    _buildPaymentCard(customerName),
                     const SizedBox(height: 20),
                   ],
                 ),
@@ -85,7 +101,7 @@ class _PaymentSourceScreenState extends State<PaymentSourceScreen> {
     );
   }
 
-  Widget _buildTotalAmountCard() {
+  Widget _buildTotalAmountCard(double totalAmount) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -112,9 +128,9 @@ class _PaymentSourceScreenState extends State<PaymentSourceScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            '\$134.526',
-            style: TextStyle(
+          Text(
+            '₹${totalAmount.toStringAsFixed(0)}',
+            style: const TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
               color: Colors.black,
@@ -125,7 +141,7 @@ class _PaymentSourceScreenState extends State<PaymentSourceScreen> {
     );
   }
 
-  Widget _buildQRCodeSection() {
+  Widget _buildQRCodeSection(double totalAmount) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -140,7 +156,7 @@ class _PaymentSourceScreenState extends State<PaymentSourceScreen> {
         const SizedBox(height: 20),
         Center(
           child: QrImageView(
-            data: 'upi://pay?pa=vishnu@upi&pn=Vishnu&am=4250.00&cu=INR',
+            data: 'upi://pay?pa=rvaquatech@upi&pn=RVAquaTech&am=${totalAmount.toStringAsFixed(2)}&cu=INR',
             version: QrVersions.auto,
             size: 220,
             backgroundColor: Colors.white,
@@ -150,7 +166,7 @@ class _PaymentSourceScreenState extends State<PaymentSourceScreen> {
     );
   }
 
-  Widget _buildPaymentCard() {
+  Widget _buildPaymentCard(String customerName) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -162,9 +178,9 @@ class _PaymentSourceScreenState extends State<PaymentSourceScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Customer Name : Vishnu',
-            style: TextStyle(
+          Text(
+            'Customer Name : $customerName',
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Colors.black,

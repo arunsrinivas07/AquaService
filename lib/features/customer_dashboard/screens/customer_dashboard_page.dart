@@ -1,4 +1,4 @@
-// lib/features/customer_dashboard/presentation/page/customer_dashboard_page.dart
+// lib/features/customer_dashboard/screens/customer_dashboard_page.dart
 
 import 'package:flutter/material.dart';
 import '../widgets/header_section.dart';
@@ -6,6 +6,7 @@ import '../widgets/tds_card.dart';
 import '../widgets/quick_actions_section.dart';
 import '../widgets/payment_card.dart';
 import '../widgets/service_card.dart';
+import '../widgets/payment_calendar.dart';
 
 class CustomerDashboardPage extends StatelessWidget {
   const CustomerDashboardPage({super.key});
@@ -41,6 +42,8 @@ class CustomerDashboardPage extends StatelessWidget {
                     QuickActionsSection(),
                     SizedBox(height: 20),
                     PaymentCard(),
+                    SizedBox(height: 20),
+                    PaymentCalendar(),
                     SizedBox(height: 20),
                     ServiceCard(),
                     SizedBox(height: 30),

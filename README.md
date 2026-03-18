@@ -1,106 +1,95 @@
-# RoWater - Aqua Service Management System
+# AquaPure User App
 
-RoWater (Aqua Service) is a professional, production-grade Flutter application designed for managing reverse osmosis (RO) water purification services. The app provides a seamless experience for both service providers (admins) and consumers (customers), streamlining service requests, machine maintenance, payment tracking, and overall management.
+A modern, feature-rich Flutter application for AquaPure customers to manage their water purifier systems, track maintenance schedules, handle payments, and book service requests.
 
-## 🚀 Vision
+## 🌟 Key Features
 
-To provide a robust and scalable platform that ensures high-quality water service management through real-time tracking, efficient scheduling, and transparent communication.
+### Dashboard & Health Monitoring
+- **Real-time TDS Tracking**: Dynamic dashboard that calculates and displays the current water TDS (Total Dissolved Solids) based on the time elapsed since the last service.
+- **Health Indicators**: Visual progress bars and status indicators (Healthy, Maintenance Due, Action Required) that change color based on water quality.
+- **Service Countdown**: Smart countdown timer showing exactly when the next maintenance is due.
 
----
+### Profile & Device Management
+- **Customer Details**: View and edit profile information including name, phone number, and address.
+- **Location Mapping**: Integrated map picker (`flutter_map`) to precisely set the installation location with latitude and longitude coordinates.
+- **Device Roster**: Expandable list of all registered devices/purifiers associated with the customer, showing active/inactive statuses.
+- **Local Profile Images**: Pick and save profile avatars locally using secure device storage.
 
-## 🏗️ Project Architecture
+### Booking & Maintenance
+- **Service Scheduling**: Request new maintenance or installation services directly from the app.
+- **Smart Forms**: Booking forms automatically detect the user's registered machine models for quick selection.
+- **Status Tracking**: A dedicated "Status & Tracking" screen to monitor the real-time progress of both maintenance requests and complaints.
+- **Previous Service Tracking**: Automatically syncs the last completed maintenance date from the backend to calculate current system health accurately.
 
-The project follows a **Feature-First Architecture**, ensuring high modularity, maintainability, and scalability. This structure separates the codebase into distinct features, making it easier for teams to work on different parts of the application simultaneously.
+### Financials & Payments
+- **Payment History**: Dedicated screen to view all registered machines, their installation dates, and the total initial payment amount.
+- **Outstanding Balance**: Dashboard cards directly display any pending balance for quick action.
 
-### Directory Structure
-
-```text
-ro_water/
-├── android/            # Android-specific configuration and code
-├── ios/                # iOS-specific configuration and code
-├── assets/             # Static assets like images and fonts
-│   └── images/         # App icons, illustrations, and images
-├── lib/
-│   ├── main.dart       # Application entry point
-│   ├── app.dart        # Main app configuration (MaterialApp, Theme, etc.)
-│   ├── core/           # Shared components and utilities
-│   │   └── widgets/    # Reusable UI components (buttons, cards, etc.)
-│   └── features/       # Modular features of the application
-│       ├── auth/       # Authentication, Login, Splash, and Language Selection
-│       ├── admin/      # Admin dashboard, Customer management, and Service hubs
-│       ├── customer/   # Customer portal, Service scheduling, and History
-│       └── payment/    # Payment dues, Overviews, and Transaction handling
-├── test/               # Unit and Widget tests
-└── pubspec.yaml        # Project dependencies and configuration
-```
+### Security
+- **Persistent Login**: Secure session management using `shared_preferences` that keeps users logged in across app restarts.
+- **Firebase Authentication**: Integrated with Firebase for secure login and data access.
 
 ---
 
-## ✨ Key Features
+## 🛠 Tech Stack & Architecture
 
-### 👤 User Authentication & Onboarding
-- **Multilingual Support**: Language selection for localized user experience.
-- **Secure Login**: Access control for different user roles.
-- **Splash Screen**: Professional branding upon app launch.
+- **Framework**: [Flutter](https://flutter.dev/) (SDK ^3.9.0)
+- **Language**: Dart
+- **State Management**: [Riverpod](https://riverpod.dev/) (`flutter_riverpod` ^2.5.1)
+- **Backend/Database**: Firebase & Cloud Firestore (`cloud_firestore` ^6.1.3)
+- **Local Storage**: `shared_preferences` (^2.5.4)
+- **Maps**: `flutter_map` (^8.2.2) and `latlong2` (^0.9.1)
+- **UI/Styling**: 
+  - Custom glassmorphism UI designs
+  - `google_fonts` (^8.0.2)
+  - `flutter_svg` (^2.2.3)
 
-### 🛠️ Admin Dashboard
-- **Management Hub**: Centralized control for service plans and complaints.
-- **Customer Directory**: Comprehensive list and map view of all customers.
-- **Activity Logs**: Detailed archival of system operations.
-- **Approval System**: Workflow for appointment and service approvals.
-
-### 📱 Customer Portal
-- **Service Scheduling**: Easy booking for machine maintenance.
-- **Complaint Tracking**: Real-time updates on reported issues.
-- **Machine Details**: Detailed information about the RO unit installed.
-- **Service History**: Complete record of previous maintenance and repairs.
-
-### 💳 Payment Management
-- **Overview Dashboard**: Visual representation of financial status.
-- **Dues Tracking**: Monitoring of pending payments.
-- **Payment Selection**: Flexible payment options for users.
+### Core Providers structure
+- `authProvider`: Manages login/logout state and persistent sessions.
+- `customerProvider`: Fetches and caches the logged-in user's profile and machine details.
+- `dashboardProvider`: Computes TDS values, health status, and combines data.
+- `maintenanceProvider`: Handles service history, upcoming dates, and auto-syncs completed records back to the customer profile.
 
 ---
 
-## 🛠️ Tech Stack
-
-- **Framework**: [Flutter](https://flutter.dev) (Dart)
-- **UI Architecture**: Feature-First / Clean Architecture principles
-- **Maps**: [Google Maps Flutter](https://pub.dev/packages/google_maps_flutter) for customer location tracking
-- **Theming**: Custom Cyber-cyan Material 3 design system
-
----
-
-## 📥 Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
-- Flutter SDK (^3.9.2)
-- Dart SDK
-- Android Studio / VS Code with Flutter extensions
+- Flutter SDK (version 3.9.0 or higher)
+- Android Studio / Xcode for emulators and building
+- A functional Firebase project with Firestore enabled
 
 ### Installation
-1.  **Clone the repository**:
-    ```bash
-    git clone https://github.com/your-username/ro_water.git
-    cd ro_water
-    ```
-2.  **Install dependencies**:
-    ```bash
-    flutter pub get
-    ```
-3.  **Run the application**:
-    ```bash
-    flutter run
-    ```
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd userapp
+   ```
+
+2. **Install dependencies**
+   ```bash
+   flutter pub get
+   ```
+
+3. **Firebase Setup**
+   - Ensure you have the `google-services.json` (Android) and/or `GoogleService-Info.plist` (iOS) placed in their respective directories (`android/app` and `ios/Runner`).
+   - The app uses `firebase_options.dart` generated by the FlutterFire CLI.
+
+4. **Run the App**
+   ```bash
+   flutter run
+   ```
+
+## 🗄 Firestore Data Structure Requirements
+
+To ensure the app correctly routes and calculates data, the following collections are used:
+
+- `CustomerDetails`: User profiles, containing arrays of `MachineDetails` and the `previous_maintenance_date` (Timestamp).
+- `LoginAuth`: Phone numbers and passwords for authentication.
+- `maintance_Installation`: Bookings for service and installation, containing a `status` field (pending/completed).
+- `Complaints`: User reports for broken or malfunctioning machines.
+- `Payments`: Outstanding balance records.
 
 ---
-
-## 🤝 Contribution
-
-This project is structured for collaborative development. Please follow the feature-first pattern when adding new functionality and ensure that reusable widgets are placed in the `core/widgets` directory.
-
----
-
-## 📄 License
-
-This project is private and intended for internal use only.
+*Built with Flutter* 💙

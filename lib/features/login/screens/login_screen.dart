@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../main.dart';
+import '../providers/auth_provider.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -19,17 +21,58 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  Future<void> _handleLogin() async {
+    final phone = _phoneController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (phone.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter phone number and password'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final success = await ref.read(authProvider.notifier).login(phone, password);
+
+    if (!mounted) return;
+
+    if (success) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const MainScreen()),
+        (route) => false,
+      );
+    }
+    // Error is shown via the Consumer widget below
+  }
+
   @override
   Widget build(BuildContext context) {
     final double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     final Size screenSize = MediaQuery.of(context).size;
+    final authState = ref.watch(authProvider);
+
+    // Show error snackbar when error changes
+    ref.listen<AuthState>(authProvider, (previous, next) {
+      if (next.errorMessage != null && next.errorMessage != previous?.errorMessage) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.errorMessage!),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    });
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: SizedBox.expand(
         child: Stack(
           children: [
-            // Background image - Fixed using screen size to prevent resizing/shifting
+            // Background image
             Positioned(
               top: 0,
               left: 0,
@@ -113,36 +156,32 @@ class _LoginScreenState extends State<LoginScreen> {
                                     width: 220,
                                     height: 56,
                                     child: ElevatedButton(
-                                      onPressed: () {
-                                        Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const MainScreen(),
-                                          ),
-                                          (route) => false,
-                                        );
-                                      },
+                                      onPressed: authState.isLoading ? null : _handleLogin,
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(
-                                          0xFF5F7F8A,
-                                        ),
+                                        backgroundColor: const Color(0xFF5F7F8A),
                                         foregroundColor: Colors.white,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            32,
-                                          ),
+                                          borderRadius: BorderRadius.circular(32),
                                         ),
                                         elevation: 4,
                                       ),
-                                      child: const Text(
-                                        'Log In',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600,
-                                          letterSpacing: 0.5,
-                                        ),
-                                      ),
+                                      child: authState.isLoading
+                                          ? const SizedBox(
+                                              width: 24,
+                                              height: 24,
+                                              child: CircularProgressIndicator(
+                                                color: Colors.white,
+                                                strokeWidth: 2,
+                                              ),
+                                            )
+                                          : const Text(
+                                              'Log In',
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w600,
+                                                letterSpacing: 0.5,
+                                              ),
+                                            ),
                                     ),
                                   ),
                                 ),
